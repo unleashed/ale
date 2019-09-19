@@ -1,0 +1,19 @@
+[package]
+name = "ale"
+version = "0.1.0"
+authors = ["Alejandro Martinez Ruiz <alex@flawedcode.org>"]
+edition = "2018"
+license = "Apache-2.0"
+repository = "https://github.com/unleashed/ale"
+readme = "README.md"
+keywords = ["3scale", "api-management", "api", "cli"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = "^0.9"
+
+[dependencies.threescalers]
+git = "https://github.com/3scale-rs/threescalers.git"
+default-features = false
+features = ["reqwest-sync", "xml-response"]
