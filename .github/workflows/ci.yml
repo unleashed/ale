@@ -1,0 +1,180 @@
+on: [push, pull_request]
+
+name: Continuous Integration
+
+jobs:
+  check:
+    name: Check
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - nightly
+        include:
+          - rust: nightly
+            fallible: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install ${{ matrix.rust }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        continue-on-error: ${{ matrix.fallible == true }}
+        with:
+          command: check
+          args: --all-features
+
+  fmt-nightly:
+    name: Rustfmt (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - id: component
+        uses: actions-rs/components-nightly@v1
+        with:
+          target: x86_64-unknown-linux-gnu
+          component: rustfmt
+
+      - name: Install latest nightly toolchain with rustfmt available
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ steps.component.outputs.toolchain }}
+          override: true
+
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        continue-on-error: true
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    name: Clippy (stable)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+
+  clippy-nightly:
+    name: Clippy (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - id: component
+        uses: actions-rs/components-nightly@v1
+        with:
+          target: x86_64-unknown-linux-gnu
+          component: clippy
+
+      - name: Install latest nightly toolchain with clippy available
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ steps.component.outputs.toolchain }}
+          override: true
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+
+  test-debug:
+    name: Test Suite (Debug)
+    needs: [check]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        rust:
+          - stable
+          - nightly
+        release:
+          - --release
+          - ''
+        exclude:
+          - os: macOS-latest
+            rust: nightly
+          - os: windows-latest
+            rust: nightly
+          - os: macOS-latest
+            release: --release
+          - os: windows-latest
+            release: --release
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install ${{ matrix.rust }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features ${{ matrix.release }}
+
+  test-release:
+    name: Test Suite (Release)
+    needs: [check]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - nightly
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install ${{ matrix.rust }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release --all-features
