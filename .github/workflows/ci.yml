@@ -1,6 +1,15 @@
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - trying
+      - staging
+      - 'releases/**'
+    tags:
+      - v*
 
-name: Continuous Integration
+name: ci
 
 jobs:
   fmt-nightly:
