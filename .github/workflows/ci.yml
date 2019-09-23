@@ -77,6 +77,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - macOS-latest
+          - windows-latest
         rust:
           - stable
           - nightly
@@ -86,35 +88,14 @@ jobs:
         exclude:
           - rust: nightly
             release: --release
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v1
-
-      - name: Install ${{ matrix.rust }} toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          override: true
-
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features ${{ matrix.release }}
-
-  test-others:
-    name: Test OS
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - macOS-latest
-          - windows-latest
-        rust:
-          - stable
-        release:
-          - ''
+          - os: macOS-latest
+            rust: nightly
+          - os: macOS-latest
+            release: --release
+          - os: windows-latest
+            rust: nightly
+          - os: windows-latest
+            release: --release
     steps:
       - name: Checkout sources
         uses: actions/checkout@v1
