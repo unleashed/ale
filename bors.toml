@@ -1,8 +1,5 @@
 status = [
-        "ci / Clippy (nightly) (push)",
-        "ci / Test (ubuntu-latest, stable, --release) (push)",
-        "ci / Test (ubuntu-latest, stable) (push)",
-        "ci / Test (ubuntu-latest, nightly) (push)"
+        "ci / Clippy (nightly) (push)"
     ]
 pr_status = [
         "ci / Clippy (nightly) (pull_request)",
