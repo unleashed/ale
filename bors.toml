@@ -1,5 +1,5 @@
 status = [
-        "ci / Clippy (nightly) (push)"
+        "bors / clippy-nightly (push)"
     ]
 pr_status = [
         "ci / Clippy (nightly) (pull_request)",
