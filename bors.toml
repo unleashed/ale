@@ -1,0 +1,11 @@
+status = [
+        "bors / clippy-nightly (push)"
+    ]
+pr_status = [
+        "ci / Clippy (nightly) (pull_request)",
+        "ci / Test (ubuntu-latest, stable, --release) (pull_request)",
+        "ci / Test (ubuntu-latest, stable) (pull_request)",
+        "ci / Test (ubuntu-latest, nightly) (pull_request)"
+    ]
+block_labels = ["wip"]
+delete_merged_branches = true

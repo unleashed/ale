@@ -1,40 +1,17 @@
 on:
-  pull_request:
+  push:
+    branches:
+      - master
+      - trying
+      - staging
+      - 'releases/**'
+      - 'integration/**'
 
-name: ci
+name: bors
 
 jobs:
-  fmt-nightly:
-    name: Rustfmt (nightly)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v1
-
-      - id: component
-        uses: actions-rs/components-nightly@v1
-        with:
-          target: x86_64-unknown-linux-gnu
-          component: rustfmt
-
-      - name: Install latest nightly toolchain with rustfmt available
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ steps.component.outputs.toolchain }}
-          override: true
-
-      - name: Install rustfmt
-        run: rustup component add rustfmt
-
-      - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        continue-on-error: true
-        with:
-          command: fmt
-          args: --all -- --check
-
   clippy-nightly:
-    name: Clippy (nightly)
+    #name: Clippy (nightly)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -62,32 +39,19 @@ jobs:
           args: -- -D warnings
 
   test:
-    name: Test
+    #name: Test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         rust:
           - stable
           - nightly
         release:
           - --release
           - ''
-        exclude:
-          - rust: nightly
-            release: --release
-          - os: macOS-latest
-            rust: nightly
-          - os: macOS-latest
-            release: --release
-          - os: windows-latest
-            rust: nightly
-          - os: windows-latest
-            release: --release
     steps:
       - name: Checkout sources
         uses: actions/checkout@v1
