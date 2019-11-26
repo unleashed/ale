@@ -11,20 +11,23 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v1
 
-      - id: component
-        uses: actions-rs/components-nightly@v1
-        with:
-          target: x86_64-unknown-linux-gnu
-          component: rustfmt
+      #- id: component
+      #  uses: actions-rs/components-nightly@v1
+      #  with:
+      #    target: x86_64-unknown-linux-gnu
+      #    component: rustfmt
 
       - name: Install latest nightly toolchain with rustfmt available
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ steps.component.outputs.toolchain }}
+          profile: minimal
+          #toolchain: ${{ steps.component.outputs.toolchain }}
+          toolchain: nightly
           override: true
+          components: rustfmt
 
-      - name: Install rustfmt
-        run: rustup component add rustfmt
+      #- name: Install rustfmt
+      #  run: rustup component add rustfmt
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
@@ -40,20 +43,23 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v1
 
-      - id: component
-        uses: actions-rs/components-nightly@v1
-        with:
-          target: x86_64-unknown-linux-gnu
-          component: clippy
+      #- id: component
+      #  uses: actions-rs/components-nightly@v1
+      #  with:
+      #    target: x86_64-unknown-linux-gnu
+      #    component: clippy
 
       - name: Install latest nightly toolchain with clippy available
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ steps.component.outputs.toolchain }}
+          profile: minimal
+          #toolchain: ${{ steps.component.outputs.toolchain }}
+          toolchain: nightly
           override: true
+          components: clippy
 
-      - name: Install clippy
-        run: rustup component add clippy
+      #- name: Install clippy
+      #  run: rustup component add clippy
 
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
