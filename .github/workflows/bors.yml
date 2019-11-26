@@ -1,0 +1,69 @@
+on:
+  push:
+    branches:
+      - master
+      - trying
+      - staging
+      - 'releases/**'
+      - 'integration/**'
+
+name: bors
+
+jobs:
+  clippy-nightly:
+    #name: Clippy (nightly)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - id: component
+        uses: actions-rs/components-nightly@v1
+        with:
+          target: x86_64-unknown-linux-gnu
+          component: clippy
+
+      - name: Install latest nightly toolchain with clippy available
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ steps.component.outputs.toolchain }}
+          override: true
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+
+  test:
+    #name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        rust:
+          - stable
+          - nightly
+        release:
+          - --release
+          - ''
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v1
+
+      - name: Install ${{ matrix.rust }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features ${{ matrix.release }}
